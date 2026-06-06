@@ -67,6 +67,18 @@ export default function AuthorDetailClient({ authorId }: { authorId: string }) {
     const authorData = await authorResponse.json()
     const statsData = await statsResponse.json()
 
+    if (!authorResponse.ok || !statsResponse.ok || !authorData.id) {
+      setAuthor(null)
+      setStats(null)
+      setMessage(
+        authorData.error ||
+          statsData.error ||
+          'No se pudo cargar el autor'
+      )
+      setLoading(false)
+      return
+    }
+
     setAuthor(authorData)
     setStats(statsData)
     setAuthorForm({
@@ -87,6 +99,18 @@ export default function AuthorDetailClient({ authorId }: { authorId: string }) {
       .then(async ([authorResponse, statsResponse]) => {
         const authorData = await authorResponse.json()
         const statsData = await statsResponse.json()
+
+        if (!authorResponse.ok || !statsResponse.ok || !authorData.id) {
+          setAuthor(null)
+          setStats(null)
+          setMessage(
+            authorData.error ||
+              statsData.error ||
+              'No se pudo cargar el autor'
+          )
+          setLoading(false)
+          return
+        }
 
         setAuthor(authorData)
         setStats(statsData)

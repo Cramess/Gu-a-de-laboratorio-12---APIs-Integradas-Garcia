@@ -57,6 +57,13 @@ export default function Home() {
     setLoading(true)
     const response = await fetch('/api/authors')
     const data = await response.json()
+    if (!response.ok || !Array.isArray(data)) {
+      setAuthors([])
+      setMessage(data.error || 'No se pudieron cargar los autores')
+      setLoading(false)
+      return
+    }
+
     setAuthors(data)
     setLoading(false)
   }
@@ -65,6 +72,13 @@ export default function Home() {
     fetch('/api/authors')
       .then((response) => response.json())
       .then((data) => {
+        if (!Array.isArray(data)) {
+          setAuthors([])
+          setMessage(data.error || 'No se pudieron cargar los autores')
+          setLoading(false)
+          return
+        }
+
         setAuthors(data)
         setLoading(false)
       })

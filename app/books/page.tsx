@@ -77,11 +77,22 @@ export default function BooksPage() {
     ])
     const authorsData = await authorsResponse.json()
     const booksData = await booksResponse.json()
-    setAuthors(authorsData)
-    setAllBooks(booksData)
+    const safeAuthors = Array.isArray(authorsData) ? authorsData : []
+    const safeBooks = Array.isArray(booksData) ? booksData : []
 
-    if (!form.authorId && authorsData[0]) {
-      setForm((current) => ({ ...current, authorId: authorsData[0].id }))
+    if (!authorsResponse.ok || !booksResponse.ok) {
+      setMessage(
+        authorsData.error ||
+          booksData.error ||
+          'No se pudieron cargar los datos iniciales'
+      )
+    }
+
+    setAuthors(safeAuthors)
+    setAllBooks(safeBooks)
+
+    if (!form.authorId && safeAuthors[0]) {
+      setForm((current) => ({ ...current, authorId: safeAuthors[0].id }))
     }
   }
 
@@ -90,11 +101,22 @@ export default function BooksPage() {
       .then(async ([authorsResponse, booksResponse]) => {
         const authorsData = await authorsResponse.json()
         const booksData = await booksResponse.json()
-        setAuthors(authorsData)
-        setAllBooks(booksData)
+        const safeAuthors = Array.isArray(authorsData) ? authorsData : []
+        const safeBooks = Array.isArray(booksData) ? booksData : []
 
-        if (authorsData[0]) {
-          setForm((current) => ({ ...current, authorId: authorsData[0].id }))
+        if (!authorsResponse.ok || !booksResponse.ok) {
+          setMessage(
+            authorsData.error ||
+              booksData.error ||
+              'No se pudieron cargar los datos iniciales'
+          )
+        }
+
+        setAuthors(safeAuthors)
+        setAllBooks(safeBooks)
+
+        if (safeAuthors[0]) {
+          setForm((current) => ({ ...current, authorId: safeAuthors[0].id }))
         }
       })
       .catch(() => setMessage('No se pudieron cargar los datos iniciales'))
@@ -116,6 +138,13 @@ export default function BooksPage() {
 
       const response = await fetch(`/api/books/search?${params.toString()}`)
       const data: SearchResponse = await response.json()
+      if (!response.ok || !Array.isArray(data.data)) {
+        setBooks([])
+        setMessage('No se pudo cargar la busqueda de libros')
+        setLoading(false)
+        return
+      }
+
       setBooks(data.data)
       setPagination(data.pagination)
       setLoading(false)
